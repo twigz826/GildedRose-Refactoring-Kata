@@ -128,7 +128,7 @@
 
             if (IsItemAtOrBelowMinQualityValue(item))
             {
-                item.Quality = 0;
+                item.Quality = Min_Quality;
                 return;
             }
 
