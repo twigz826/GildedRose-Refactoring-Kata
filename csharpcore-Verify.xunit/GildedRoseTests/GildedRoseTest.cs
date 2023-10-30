@@ -74,13 +74,53 @@ namespace GildedRoseTests
         }
 
         [Fact]
-        public void UpdateQuality_WhenBackstagePasses_SellInAndQualityDoNotChange()
+        public void UpdateQuality_WhenBackstagePasses_QualityIncreasesWhenSellInOver10()
         {
             IList<Item> Items = new List<Item> { new Item { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = 20, Quality = 10 } };
             GildedRose app = new(Items);
             app.UpdateQuality();
             Items[0].SellIn.Should().Be(19);
             Items[0].Quality.Should().Be(11);
+        }
+
+        [Fact]
+        public void UpdateQuality_WhenBackstagePasses_QualityIncreasesBy2WhenSellInBetween10And6()
+        {
+            IList<Item> Items = new List<Item> { new Item { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = 11, Quality = 10 } };
+            GildedRose app = new(Items);
+            app.UpdateQuality();
+            Items[0].SellIn.Should().Be(10);
+            Items[0].Quality.Should().Be(12);
+        }
+
+        [Fact]
+        public void UpdateQuality_WhenBackstagePasses_QualityIncreasesBy3WhenSellInBetween5And1()
+        {
+            IList<Item> Items = new List<Item> { new Item { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = 6, Quality = 10 } };
+            GildedRose app = new(Items);
+            app.UpdateQuality();
+            Items[0].SellIn.Should().Be(5);
+            Items[0].Quality.Should().Be(13);
+        }
+
+        [Fact]
+        public void UpdateQuality_WhenBackstagePasses_QualityGoesTo0WhenSellInReaches0()
+        {
+            IList<Item> Items = new List<Item> { new Item { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = 1, Quality = 10 } };
+            GildedRose app = new(Items);
+            app.UpdateQuality();
+            Items[0].SellIn.Should().Be(0);
+            Items[0].Quality.Should().Be(0);
+        }
+
+        [Fact]
+        public void UpdateQuality_WhenConjuredItems_QualityDegradesTwiceAsFast()
+        {
+            IList<Item> Items = new List<Item> { new Item { Name = "Conjured Dorito", SellIn = 8, Quality = 20 } };
+            GildedRose app = new(Items);
+            app.UpdateQuality();
+            Items[0].SellIn.Should().Be(7);
+            Items[0].Quality.Should().Be(18);
         }
     }
 }

@@ -5,7 +5,11 @@
         private const int Quality_Min_Value = 0;
         private const int Current_Date_Value = 0;
         private const int Max_Quality = 50;
-        private List<string> Legendary_Items = new() { "Sulfuras, Hand of Ragnaros" };
+
+        private const int Backstage_Passes_First_Quality_Increase_Threshold = 10;
+        private const int Backstage_Passes_Second_Quality_Increase_Threshold = 5;
+
+        private readonly List<string> Legendary_Items = new() { "Sulfuras, Hand of Ragnaros" };
         private readonly IList<Item> Items;
 
         public GildedRose(IList<Item> Items)
@@ -32,13 +36,16 @@
                 switch (item.Name)
                 {
                     case "Aged Brie":
-                        IncreaseItemQuality(item);
+                        IncreaseItemQuality(item, 1);
                         break;
-                    case var name when name.StartsWith("Backstage passes"):
+                    case var backstagePass when backstagePass.StartsWith("Backstage passes"):
                         AdjustQualityOfBackstagePasses(item);
                         break;
+                    case var conjuredItem when conjuredItem.StartsWith("Conjured"):
+                        DegradeItemQuality(item, 2);
+                        break;
                     default:
-                        DegradeItemQuality(item);
+                        DegradeItemQuality(item, 1);
                         break;
                 }
 
@@ -116,7 +123,48 @@
 
         private void AdjustQualityOfBackstagePasses(Item item)
         {
-            IncreaseItemQuality(item);
+            if (IsConcertFinished(item))
+            {
+                item.Quality = 0;
+                return;
+            }
+
+            if (IsConcertOverTenDaysAway(item))
+            {
+                IncreaseItemQuality(item, 1);
+            }
+
+            if (IsConcertHappeningInFiveToTenDays(item))
+            {
+                IncreaseItemQuality(item, 2);
+            }
+
+            if (IsConcertHappeningWithinFiveDays(item))
+            {
+                IncreaseItemQuality(item, 3);
+            }
+
+        }
+
+        private static bool IsConcertFinished(Item item)
+        {
+            return item.SellIn <= 0;
+        }
+
+        private static bool IsConcertHappeningWithinFiveDays(Item item)
+        {
+            return item.SellIn > 0 && item.SellIn <= Backstage_Passes_Second_Quality_Increase_Threshold;
+        }
+
+        private static bool IsConcertHappeningInFiveToTenDays(Item item)
+        {
+            return item.SellIn > Backstage_Passes_Second_Quality_Increase_Threshold
+                && item.SellIn <= Backstage_Passes_First_Quality_Increase_Threshold;
+        }
+
+        private static bool IsConcertOverTenDaysAway(Item item)
+        {
+            return item.SellIn > Backstage_Passes_First_Quality_Increase_Threshold;
         }
 
         private bool IsLegendaryItem(Item item)
@@ -124,37 +172,37 @@
             return Legendary_Items.Contains(item.Name);
         }
 
-        private bool IsItemAtMaxQuality(Item item)
+        private static bool IsItemAtMaxQuality(Item item)
         {
             return item.Quality == Max_Quality;
         }
 
-        private static void IncreaseItemQuality(Item item)
+        private static void IncreaseItemQuality(Item item, int valueIncrease)
         {
-            item.Quality += 1;
+            item.Quality += valueIncrease;
         }
 
-        private static void DegradeItemQuality(Item item)
+        private static void DegradeItemQuality(Item item, int valueDecrease)
         {
-            if (IsItemAtMinValue(item))
+            if (IsItemAtMinQualityValue(item))
             {
                 return;
             }
 
-            DegradeQuality(item);
+            DegradeQuality(item, valueDecrease);
 
             if (IsItemOutOfDate(item))
             {
-                DegradeQuality(item);
+                DegradeQuality(item, valueDecrease);
             }
         }
 
-        private static void DegradeQuality(Item item)
+        private static void DegradeQuality(Item item, int valueDecrease)
         {
-            item.Quality -= 1;
+            item.Quality -= valueDecrease;
         }
 
-        private static bool IsItemAtMinValue(Item item)
+        private static bool IsItemAtMinQualityValue(Item item)
         {
             return item.Quality == Quality_Min_Value;
         }
