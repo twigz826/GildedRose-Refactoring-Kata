@@ -7,7 +7,7 @@ namespace GildedRoseTests
 {
     public class AcceptanceTest
     {
-        readonly List<Item> items = new List<Item>
+        readonly List<Item> items = new()
         {
             new Item { Name = "+5 Dexterity Vest", SellIn = 10, Quality = 20 },
             new Item { Name = "Aged Brie", SellIn = 2, Quality = 21 },
