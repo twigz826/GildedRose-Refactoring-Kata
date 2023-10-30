@@ -2,12 +2,9 @@
 {
     public class GildedRose
     {
-        private const int Quality_Min_Value = 0;
+        private const int Min_Quality = 0;
         private const int Current_Date_Value = 0;
         private const int Max_Quality = 50;
-
-        private const int Backstage_Passes_First_Quality_Increase_Threshold = 10;
-        private const int Backstage_Passes_Second_Quality_Increase_Threshold = 5;
 
         private readonly List<string> Legendary_Items = new() { "Sulfuras, Hand of Ragnaros" };
         private readonly IList<Item> Items;
@@ -28,7 +25,7 @@
 
                 DegradeItemSellIn(item);
 
-                if (IsItemAtMaxQuality(item))
+                if (IsItemAtMaxQuality(item) && !IsItemBackstagePass(item))
                 {
                     continue;
                 }
@@ -48,84 +45,19 @@
                         DegradeItemQuality(item, 1);
                         break;
                 }
-
-                //if (Items[i].Name != "Aged Brie" && Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
-                //{
-                //    if (Items[i].Quality > 0)
-                //    {
-                //        if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                //        {
-                //            Items[i].Quality = Items[i].Quality - 1;
-                //        }
-                //    }
-                //}
-                //else
-                //{
-                //    if (Items[i].Quality < 50)
-                //    {
-                //        Items[i].Quality = Items[i].Quality + 1;
-
-                //        if (Items[i].Name == "Backstage passes to a TAFKAL80ETC concert")
-                //        {
-                //            if (Items[i].SellIn < 11)
-                //            {
-                //                if (Items[i].Quality < 50)
-                //                {
-                //                    Items[i].Quality = Items[i].Quality + 1;
-                //                }
-                //            }
-
-                //            if (Items[i].SellIn < 6)
-                //            {
-                //                if (Items[i].Quality < 50)
-                //                {
-                //                    Items[i].Quality = Items[i].Quality + 1;
-                //                }
-                //            }
-                //        }
-                //    }
-                //}
-
-                //if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                //{
-                //    Items[i].SellIn = Items[i].SellIn - 1;
-                //}
-
-                //if (Items[i].SellIn < 0)
-                //{
-                //    if (Items[i].Name != "Aged Brie")
-                //    {
-                //        if (Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
-                //        {
-                //            if (Items[i].Quality > 0)
-                //            {
-                //                if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                //                {
-                //                    Items[i].Quality = Items[i].Quality - 1;
-                //                }
-                //            }
-                //        }
-                //        else
-                //        {
-                //            Items[i].Quality = Items[i].Quality - Items[i].Quality;
-                //        }
-                //    }
-                //    else
-                //    {
-                //        if (Items[i].Quality < 50)
-                //        {
-                //            Items[i].Quality = Items[i].Quality + 1;
-                //        }
-                //    }
-                //}
             }
         }
 
-        private void AdjustQualityOfBackstagePasses(Item item)
+        private static bool IsItemBackstagePass(Item item)
+        {
+            return item.Name.StartsWith("Backstage passes");
+        }
+
+        private static void AdjustQualityOfBackstagePasses(Item item)
         {
             if (IsConcertFinished(item))
             {
-                item.Quality = 0;
+                item.Quality = Min_Quality;
                 return;
             }
 
@@ -144,27 +76,35 @@
                 IncreaseItemQuality(item, 3);
             }
 
+            if (IsMaxQualityExceeded(item))
+            {
+                item.Quality = Max_Quality;
+            }
+        }
+
+        private static bool IsMaxQualityExceeded(Item item)
+        {
+            return item.Quality > Max_Quality;
         }
 
         private static bool IsConcertFinished(Item item)
         {
-            return item.SellIn <= 0;
+            return IsItemOutOfDate(item);
         }
 
         private static bool IsConcertHappeningWithinFiveDays(Item item)
         {
-            return item.SellIn > 0 && item.SellIn <= Backstage_Passes_Second_Quality_Increase_Threshold;
+            return item.SellIn >= 0 && item.SellIn <= 5;
         }
 
         private static bool IsConcertHappeningInFiveToTenDays(Item item)
         {
-            return item.SellIn > Backstage_Passes_Second_Quality_Increase_Threshold
-                && item.SellIn <= Backstage_Passes_First_Quality_Increase_Threshold;
+            return item.SellIn > 5 && item.SellIn <= 10;
         }
 
         private static bool IsConcertOverTenDaysAway(Item item)
         {
-            return item.SellIn > Backstage_Passes_First_Quality_Increase_Threshold;
+            return item.SellIn > 10;
         }
 
         private bool IsLegendaryItem(Item item)
@@ -184,12 +124,13 @@
 
         private static void DegradeItemQuality(Item item, int valueDecrease)
         {
-            if (IsItemAtMinQualityValue(item))
+            DegradeQuality(item, valueDecrease);
+
+            if (IsItemAtOrBelowMinQualityValue(item))
             {
+                item.Quality = 0;
                 return;
             }
-
-            DegradeQuality(item, valueDecrease);
 
             if (IsItemOutOfDate(item))
             {
@@ -202,9 +143,9 @@
             item.Quality -= valueDecrease;
         }
 
-        private static bool IsItemAtMinQualityValue(Item item)
+        private static bool IsItemAtOrBelowMinQualityValue(Item item)
         {
-            return item.Quality == Quality_Min_Value;
+            return item.Quality <= Min_Quality;
         }
 
         private static bool IsItemOutOfDate(Item item)

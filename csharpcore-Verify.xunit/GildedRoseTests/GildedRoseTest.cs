@@ -104,12 +104,12 @@ namespace GildedRoseTests
         }
 
         [Fact]
-        public void UpdateQuality_WhenBackstagePasses_QualityGoesTo0WhenSellInReaches0()
+        public void UpdateQuality_WhenBackstagePasses_QualityGoesTo0WhenSellInReachesNegative1()
         {
-            IList<Item> Items = new List<Item> { new Item { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = 1, Quality = 10 } };
+            IList<Item> Items = new List<Item> { new Item { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = 0, Quality = 10 } };
             GildedRose app = new(Items);
             app.UpdateQuality();
-            Items[0].SellIn.Should().Be(0);
+            Items[0].SellIn.Should().Be(-1);
             Items[0].Quality.Should().Be(0);
         }
 
