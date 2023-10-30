@@ -4,6 +4,8 @@
     {
         private const int Quality_Min_Value = 0;
         private const int Current_Date_Value = 0;
+        private const int Max_Quality = 50;
+        private List<string> Legendary_Items = new() { "Sulfuras, Hand of Ragnaros" };
         private readonly IList<Item> Items;
 
         public GildedRose(IList<Item> Items)
@@ -15,11 +17,25 @@
         {
             foreach (var item in Items)
             {
+                if (IsLegendaryItem(item))
+                {
+                    continue;
+                }
+
                 DegradeItemSellIn(item);
+
+                if (IsItemAtMaxQuality(item))
+                {
+                    continue;
+                }
+
                 switch (item.Name)
                 {
                     case "Aged Brie":
                         IncreaseItemQuality(item);
+                        break;
+                    case var name when name.StartsWith("Backstage passes"):
+                        AdjustQualityOfBackstagePasses(item);
                         break;
                     default:
                         DegradeItemQuality(item);
@@ -96,6 +112,21 @@
                 //    }
                 //}
             }
+        }
+
+        private void AdjustQualityOfBackstagePasses(Item item)
+        {
+            IncreaseItemQuality(item);
+        }
+
+        private bool IsLegendaryItem(Item item)
+        {
+            return Legendary_Items.Contains(item.Name);
+        }
+
+        private bool IsItemAtMaxQuality(Item item)
+        {
+            return item.Quality == Max_Quality;
         }
 
         private static void IncreaseItemQuality(Item item)

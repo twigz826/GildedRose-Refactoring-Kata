@@ -46,5 +46,41 @@ namespace GildedRoseTests
             Items[0].SellIn.Should().Be(-1);
             Items[0].Quality.Should().Be(11);
         }
+
+        [Fact]
+        public void UpdateQuality_WhenAnyItem_QualityDoesNotGoAbove50()
+        {
+            IList<Item> Items = new List<Item>
+            {
+                new Item { Name = "Aged Brie", SellIn = 10, Quality = 50 },
+                new Item { Name = "Another Item", SellIn = 0, Quality = 50 }
+            };
+            GildedRose app = new(Items);
+            app.UpdateQuality();
+            Items[0].SellIn.Should().Be(9);
+            Items[0].Quality.Should().Be(50);
+            Items[1].SellIn.Should().Be(-1);
+            Items[1].Quality.Should().Be(50);
+        }
+
+        [Fact]
+        public void UpdateQuality_WhenLegendaryItem_SellInAndQualityDoNotChange()
+        {
+            IList<Item> Items = new List<Item> { new Item { Name = "Sulfuras, Hand of Ragnaros", SellIn = 20, Quality = 80 } };
+            GildedRose app = new(Items);
+            app.UpdateQuality();
+            Items[0].SellIn.Should().Be(20);
+            Items[0].Quality.Should().Be(80);
+        }
+
+        [Fact]
+        public void UpdateQuality_WhenBackstagePasses_SellInAndQualityDoNotChange()
+        {
+            IList<Item> Items = new List<Item> { new Item { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = 20, Quality = 10 } };
+            GildedRose app = new(Items);
+            app.UpdateQuality();
+            Items[0].SellIn.Should().Be(19);
+            Items[0].Quality.Should().Be(11);
+        }
     }
 }
