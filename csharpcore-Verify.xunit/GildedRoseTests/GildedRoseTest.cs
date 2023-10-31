@@ -40,11 +40,21 @@ namespace GildedRoseTests
         [Fact]
         public void UpdateQuality_WhenAgedBrie_QualityIncreases()
         {
+            IList<Item> Items = new List<Item> { new Item { Name = "Aged Brie", SellIn = 10, Quality = 10 } };
+            GildedRose app = new(Items);
+            app.UpdateQuality();
+            Items[0].SellIn.Should().Be(9);
+            Items[0].Quality.Should().Be(11);
+        }
+
+        [Fact]
+        public void UpdateQuality_WhenAgedBrie_QualityIncreasesTwiceAsFastWhenPastSellbyDate()
+        {
             IList<Item> Items = new List<Item> { new Item { Name = "Aged Brie", SellIn = 0, Quality = 10 } };
             GildedRose app = new(Items);
             app.UpdateQuality();
             Items[0].SellIn.Should().Be(-1);
-            Items[0].Quality.Should().Be(11);
+            Items[0].Quality.Should().Be(12);
         }
 
         [Fact]
@@ -53,14 +63,14 @@ namespace GildedRoseTests
             IList<Item> Items = new List<Item>
             {
                 new Item { Name = "Aged Brie", SellIn = 10, Quality = 50 },
-                new Item { Name = "Another Item", SellIn = 0, Quality = 50 }
+                new Item { Name = "Another Item", SellIn = 10, Quality = 50 }
             };
             GildedRose app = new(Items);
             app.UpdateQuality();
             Items[0].SellIn.Should().Be(9);
             Items[0].Quality.Should().Be(50);
-            Items[1].SellIn.Should().Be(-1);
-            Items[1].Quality.Should().Be(50);
+            Items[1].SellIn.Should().Be(9);
+            Items[1].Quality.Should().Be(49);
         }
 
         [Fact]
@@ -86,20 +96,20 @@ namespace GildedRoseTests
         [Fact]
         public void UpdateQuality_WhenBackstagePasses_QualityIncreasesBy2WhenSellInBetween10And6()
         {
-            IList<Item> Items = new List<Item> { new Item { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = 11, Quality = 10 } };
+            IList<Item> Items = new List<Item> { new Item { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = 10, Quality = 10 } };
             GildedRose app = new(Items);
             app.UpdateQuality();
-            Items[0].SellIn.Should().Be(10);
+            Items[0].SellIn.Should().Be(9);
             Items[0].Quality.Should().Be(12);
         }
 
         [Fact]
         public void UpdateQuality_WhenBackstagePasses_QualityIncreasesBy3WhenSellInBetween5And1()
         {
-            IList<Item> Items = new List<Item> { new Item { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = 6, Quality = 10 } };
+            IList<Item> Items = new List<Item> { new Item { Name = "Backstage passes to a TAFKAL80ETC concert", SellIn = 5, Quality = 10 } };
             GildedRose app = new(Items);
             app.UpdateQuality();
-            Items[0].SellIn.Should().Be(5);
+            Items[0].SellIn.Should().Be(4);
             Items[0].Quality.Should().Be(13);
         }
 
