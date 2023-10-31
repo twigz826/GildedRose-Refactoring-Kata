@@ -10,11 +10,11 @@ namespace GildedRoseTests
         [Fact]
         public void UpdateQuality_WhenStandardItem_DecreasesSellInAndQualityBy1()
         {
-            IList<Item> Items = new List<Item> { new Item { Name = "StandardItem", SellIn = 10, Quality = 10 } };
-            GildedRose app = new(Items);
+            var items = new List<Item> { new Item { Name = "StandardItem", SellIn = 10, Quality = 10 } };
+            var app = new GildedRose(items);
             app.UpdateQuality();
-            Items[0].SellIn.Should().Be(9);
-            Items[0].Quality.Should().Be(9);
+            items[0].SellIn.Should().Be(9);
+            items[0].Quality.Should().Be(9);
         }
     }
 }
