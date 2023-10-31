@@ -50,7 +50,7 @@ namespace GildedRoseTests
         }
 
         [Fact]
-        public void GildedRoseSecondAcceptanceTesty_FiveDays()
+        public void GildedRoseSecondAcceptanceTest_FiveDays()
         {
             var days = 5;
             var gildedRoseStore = CreateStore(items);

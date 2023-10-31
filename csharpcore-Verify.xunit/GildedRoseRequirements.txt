@@ -20,7 +20,7 @@ Pretty simple, right? Well this is where it gets interesting:
 	- The Quality of an item is never negative
 	- The Quality of an item is never more than 50
 	- "Aged Brie" actually increases in Quality the older it gets - it increases by 1 before its sell by date,
-	and increases by 2 after the sell by date
+	and increases by 2 after the sell by date has passed (i.e. when SellIn value becomes negative)
 	- "Sulfuras", being a legendary item, never has to be sold or decreases in Quality
 	- "Backstage passes", similar to aged brie, increases in Quality as its SellIn value approaches;
 	Quality increases by 2 when there are 10 days or less and by 3 when there are 5 days or less but
@@ -33,8 +33,7 @@ We have recently signed a supplier of conjured items. This requires an update to
 Feel free to make any changes to the UpdateQuality method and add any new code as long as everything
 still works correctly. However, do not alter the Item class or Items property as those belong to the
 goblin in the corner who will insta-rage and one-shot you as he doesn't believe in shared code
-ownership (you can make the UpdateQuality method and Items property static if you like, we'll cover
-for you).
+ownership.
 
 Just for clarification, an item can never have its Quality increase above 50, however "Sulfuras" is a
 legendary item and as such its Quality is 80 and it never alters.
